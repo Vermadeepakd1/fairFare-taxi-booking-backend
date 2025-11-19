@@ -10,12 +10,15 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const taxisRef = db.collection('taxis');
-    const snapshot = await taxisRef.where('status', '==', 'available').get();
+    // Get all taxis (not just available) so we can track moving taxis
+    const snapshot = await taxisRef.get();
 
-    console.log(`Found ${snapshot.size} available taxis in database`);
+    // Only log occasionally to reduce console spam
+    if (Math.random() < 0.1) { // Log 10% of the time
+      console.log(`Found ${snapshot.size} taxis in database`);
+    }
 
     if (snapshot.empty) {
-      console.log('No available taxis found in database');
       return res.json({ taxis: [] });
     }
 
@@ -25,7 +28,7 @@ router.get('/', async (req, res) => {
       const lat = data.location?.latitude || data.location?._latitude;
       const lng = data.location?.longitude || data.location?._longitude;
       
-      // Only include taxis with valid locations
+      // Include all taxis with valid locations (available, en-route, arrived, etc.)
       if (lat && lng) {
         taxis.push({
           id: doc.id,
@@ -35,18 +38,28 @@ router.get('/', async (req, res) => {
             latitude: lat,
             longitude: lng,
           },
-          status: data.status,
+          status: data.status || 'available',
         });
       } else {
-        console.warn(`Taxi ${doc.id} has invalid location, skipping`);
+        // Only log warnings occasionally
+        if (Math.random() < 0.1) {
+          console.warn(`Taxi ${doc.id} has invalid location, skipping`);
+        }
       }
     });
 
-    console.log(`Returning ${taxis.length} taxis with valid locations`);
     res.json({ taxis });
   } catch (error) {
     console.error('Error fetching taxis:', error);
-    res.status(500).json({ error: 'Failed to fetch taxis' });
+    // Check for quota errors
+    if (error.code === 8 || error.message?.includes('Quota exceeded')) {
+      res.status(429).json({ 
+        error: 'Firestore quota exceeded. Please wait a moment before trying again.',
+        quotaExceeded: true 
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to fetch taxis' });
+    }
   }
 });
 

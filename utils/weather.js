@@ -87,55 +87,55 @@ export function getWeatherCondition(weatherData) {
   
   // Thunderstorms (highest priority)
   if ([95, 96, 99].includes(weatherCode)) {
-    return 'stormy';
+    return 'Stormy';
   }
   
   // Heavy rain or violent rain showers
   if (precipitation > 5 || [65, 67, 82].includes(weatherCode)) {
-    return 'rainy';
+    return 'Rainy';
   }
   
   // Heavy snow
   if ([75, 77, 86].includes(weatherCode)) {
-    return 'snowy';
+    return 'Snowy';
   }
   
   // Moderate rain or rain showers
   if (precipitation > 1 || [61, 63, 66, 80, 81].includes(weatherCode)) {
-    return 'rainy';
+    return 'Rainy';
   }
   
   // Moderate snow or snow showers
   if ([71, 73, 85].includes(weatherCode)) {
-    return 'snowy';
+    return 'Snowy';
   }
   
   // Light drizzle or rain
   if ([51, 53, 55, 56, 57].includes(weatherCode)) {
-    return 'rainy';
+    return 'Rainy';
   }
   
   // High wind (only if no precipitation)
   if (windSpeed > 15 && precipitation === 0) {
-    return 'windy';
+    return 'Windy';
   }
   
   // Foggy conditions
   if ([45, 48].includes(weatherCode)) {
-    return 'foggy';
+    return 'Fog';
   }
   
   // Overcast
   if (weatherCode === 3) {
-    return 'cloudy';
+    return 'Cloudy';
   }
   
   // Partly cloudy
   if (weatherCode === 2) {
-    return 'cloudy';
+    return 'Cloudy';
   }
   
   // Clear or mainly clear
-  return 'clear';
+  return 'Clear';
 }
 

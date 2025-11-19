@@ -39,6 +39,11 @@ export async function calculateDistance(originLat, originLng, destLat, destLng) 
     const element = data.rows[0].elements[0];
     
     if (element.status !== 'OK') {
+      // ZERO_RESULTS means no route found (coordinates not on roads)
+      // Return null instead of throwing to allow fallback to Euclidean distance
+      if (element.status === 'ZERO_RESULTS') {
+        return null;
+      }
       throw new Error(`Distance calculation failed: ${element.status}`);
     }
     

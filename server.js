@@ -4,11 +4,14 @@ import dotenv from 'dotenv';
 
 // Import routes
 import taxisRouter from './routes/taxis.js';
+import taxisStreamRouter from './routes/taxis-stream.js';
 import bookingsRouter from './routes/bookings.js';
 import testRouter from './routes/test.js';
 import distanceRouter from './routes/distance.js';
 import weatherRouter from './routes/weather.js';
 import adminRouter from './routes/admin.js';
+import routesRouter from './routes/routes.js';
+import mlPredictRouter from './routes/ml-predict.js';
 
 // Load environment variables
 dotenv.config();
@@ -39,10 +42,13 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/api/test', testRouter);
 app.use('/api/taxis', taxisRouter);
+app.use('/api/taxis', taxisStreamRouter); // SSE stream endpoint
 app.use('/api', bookingsRouter); // /api/book and /api/cancel
 app.use('/api/distance', distanceRouter);
 app.use('/api/weather', weatherRouter);
 app.use('/api/admin', adminRouter); // /api/admin/reset-taxis
+app.use('/api/route', routesRouter); // /api/route - Get route coordinates
+app.use('/api/ml-predict', mlPredictRouter); // /api/ml-predict - ML price prediction
 
 // --- Start the Server ---
 app.listen(PORT, () => {
